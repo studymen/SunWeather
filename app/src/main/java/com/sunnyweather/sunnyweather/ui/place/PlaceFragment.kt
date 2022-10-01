@@ -2,6 +2,7 @@ package com.sunnyweather.sunnyweather.ui.place
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.sunnyweather.sunnyweather.MainActivity
 import com.sunnyweather.sunnyweather.R
 import com.sunnyweather.sunnyweather.ui.weather.WeatherActivity
 import kotlinx.android.synthetic.main.fragment_place.*
@@ -24,7 +26,7 @@ class PlaceFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        if (viewModel.isPlaceSaved()){
+        if (activity is MainActivity && viewModel.isPlaceSaved()){
             val place=viewModel.getSavedPlace()
             val intent= Intent(context,WeatherActivity::class.java).apply {
                 putExtra("location_lng",place.location.lng)
@@ -32,6 +34,7 @@ class PlaceFragment : Fragment() {
                 putExtra("place_name",place.name)
             }
             startActivity(intent)
+            Log.e( "onActivityCreatedPF ","跳转" )
             activity?.finish()
             return
         }

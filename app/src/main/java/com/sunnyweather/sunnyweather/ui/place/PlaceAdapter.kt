@@ -1,15 +1,18 @@
 package com.sunnyweather.sunnyweather.ui.place
 
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.sunnyweather.sunnyweather.MainActivity
 import com.sunnyweather.sunnyweather.R
 import com.sunnyweather.sunnyweather.logic.model.Place
 import com.sunnyweather.sunnyweather.ui.weather.WeatherActivity
+import kotlinx.android.synthetic.main.activity_weather.*
 
 class PlaceAdapter(private val fragment: PlaceFragment,private val placeList: List<Place>):RecyclerView.Adapter<PlaceAdapter.ViewHolder>(){
    inner class ViewHolder(view:View) :RecyclerView.ViewHolder(view){
@@ -22,14 +25,24 @@ class PlaceAdapter(private val fragment: PlaceFragment,private val placeList: Li
         holder.itemView.setOnClickListener {
             val position=holder.adapterPosition
             val place=placeList[position]
-            val intent=Intent(parent.context,WeatherActivity::class.java).apply {
-                putExtra("location_lng",place.location.lng)
-                putExtra("location_lat",place.location.lat)
-                putExtra("place_name",place.name)
+            val activity=fragment.activity
+            if (activity is WeatherActivity){
+                activity.drawerLayout.closeDrawers()
+                activity.viewModel.locationLng=place.location.lng
+                activity.viewModel.locationLat=place.location.lat
+                activity.viewModel.placeName=place.name
+                activity.refreshWeather()
+            }else{
+                Log.e("PA", "onCreateViewHolder: 运行跳转", )
+                val intent=Intent(parent.context,WeatherActivity::class.java).apply {
+                    putExtra("location_lng",place.location.lng)
+                    putExtra("location_lat",place.location.lat)
+                    putExtra("place_name",place.name)
+            }
+                fragment.startActivity(intent)
+                activity?.finish()
             }
             fragment.viewModel.savePlace(place)
-            fragment.startActivity(intent)
-            fragment.activity?.finish()
         }
         return holder
     }
